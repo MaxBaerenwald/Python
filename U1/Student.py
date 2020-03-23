@@ -1,5 +1,5 @@
 class Student:
-        """ documentation"""
+        """ documentation """
 
     def __init__(self, name, mtr ):
         self.name = name
