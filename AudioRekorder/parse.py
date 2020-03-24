@@ -1,36 +1,38 @@
 import time
-
 import argparse
 import requests
-
+#Parser
 parser = argparse.ArgumentParser('Just a test')
-parser.add_argument('-url', '-u', default="http://stream.electroradio.fm/192k")
+parser.add_argument('url')
 parser.add_argument('--fileName', '-f', required=True)
-parser.add_argument('--duration', '-d', type=int, default=30)
+parser.add_argument('--duration', '-d', type=int, default=20)
 arg = parser.parse_args()
+#Überprufung richtig übergebene Eingabe
 print(arg.url, arg.duration, arg.fileName)
 
-default_file_name = time.strftime("%Y%m%d%H%M%S", time.localtime()) + ".mp3"
+#Default Name
+default_file_name = time.strftime( "%Y%m%d%H%M%S",time.localtime())+".mp3"
 
-
-def record_audio(path=arg.fileName, stream_url=arg.url, time_limit=arg.duration):
+#Param: FileName, URL, Duration
+def record_audio(path=default_file_name, stream_url="http://stream.electroradio.fm/192k", duration = 20):
+    #Zuweisung
     print("Recording audio...")
     filename = path
     m_file = open(filename, 'wb')
     chunk_size = 1024
-
     start_time_in_seconds = time.time()
 
-    time_limit = time_limit - 11 if time_limit > 11 else 1
+    time_limit = duration - 11 if duration > 11 else 1 # time in seconds, for recording
     time_elapsed = 0
     url = stream_url
+
     with requests.Session() as session:
         response = session.get(url, stream=True)
         for chunk in response.iter_content(chunk_size=chunk_size):
             if time_elapsed > time_limit:
                 break
-            # to print time elapsed
-            if int(time.time() - start_time_in_seconds) - time_elapsed > 0:
+             # to print time elapsed
+            if int(time.time() - start_time_in_seconds)- time_elapsed > 0 :
                 time_elapsed = int(time.time() - start_time_in_seconds)
                 print(time_elapsed, end='\r', flush=True)
             if chunk:
@@ -39,5 +41,4 @@ def record_audio(path=arg.fileName, stream_url=arg.url, time_limit=arg.duration)
         m_file.close()
 
 
-if arg:
-    record_audio()
+record_audio(arg.fileName, arg.url, arg.duration)
